@@ -3,7 +3,7 @@ from django.views import View
 from django.views.generic import ListView
 from movies.models import Movie, UserMovieRating
 from django.contrib.auth.mixins import LoginRequiredMixin
-from movies.recommendations import get_item_based_recommendation, get_content_based_recommendations
+# from movies.recommendations import get_item_based_recommendation, get_content_based_recommendations
 import re
 
 # Function to remove year from movie title
@@ -31,8 +31,8 @@ class ListMovies(LoginRequiredMixin, ListView):
 
     context['movies'] = Movie.objects.all()[:25] # get the first 25 movies
     context['continue_watching'] = Movie.objects.filter(usermovierating__user=user) # where the users have provided a rating
-    context['content_recommended'] = self.recommend_movies() # get the content based recommendations
-    context['item_recommended'] = self.suggest_movies() # get the collaborative item-item based recommendations
+    # context['content_recommended'] = self.recommend_movies() # get the content based recommendations
+    # context['item_recommended'] = self.suggest_movies() # get the collaborative item-item based recommendations
     return context
 
   def recommend_movies(self, **kwargs):
