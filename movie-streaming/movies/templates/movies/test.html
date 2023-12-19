@@ -16,10 +16,30 @@
             height: auto;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
+        /* Add this CSS for the loader */
+        .loader {
+            border: 2.5px solid #7c7c7c; /* Light grey */
+            border-top: 2.5px solid #0078c8; /* Blue */
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
+    <script>
+        window.onload = function() {
+            // Hide the loader when the page is loaded
+            document.getElementById("loader").style.display = "none";
+        }
+    </script>
 </head>
 <body>
-    <!-- <img src="https://i.ytimg.com/vi/O7pEJR-V5tA/maxresdefault.jpg" alt="" srcset=""> -->
+    <!-- Add this div for the loader -->
+    <div id="loader" class="loader"></div>
     <img src="{% url 'stream_video' %}" />
 </body>
 </html>

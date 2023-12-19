@@ -3,7 +3,11 @@ from django.views import View
 from django.views.generic import ListView
 from movies.models import Movie, UserMovieRating
 from django.contrib.auth.mixins import LoginRequiredMixin
-# from movies.recommendations import get_item_based_recommendation, get_content_based_recommendations
+from django.http import StreamingHttpResponse
+from django.contrib.auth.decorators import login_required
+from kafka import KafkaConsumer
+import cv2
+import numpy as np
 import re
 
 # Function to remove year from movie title
@@ -114,14 +118,11 @@ class ListAllMovies(LoginRequiredMixin, ListView):
     paginate_by = 20  
 
 
-def test(request):
+@login_required
+def salaar(request):
    return render(request, "movies/test.html")
 
-from django.http import StreamingHttpResponse
-from kafka import KafkaConsumer
-import cv2
-import numpy as np
-
+@login_required
 def stream_video(request):
     # Create a Kafka consumer
     consumer = KafkaConsumer(
@@ -151,11 +152,23 @@ def stream_video(request):
 
     # Define a generator function that yields video frames
     def play_stream():
-        for message in consumer:
-            nparr = np.frombuffer(message.value, np.uint8)
-            frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-            ret, jpeg = cv2.imencode('.jpg', frame)
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + jpeg.tobytes() + b'\r\n\r\n')
+        i = 0
+        while i<100:
+            # Poll for messages with a timeout of 1 second
+            messages = consumer.poll(1000)
+
+            # If there are no messages, continue to the next iteration
+            if not messages:
+                i += 1
+                continue
+
+            # Process the messages
+            for tp, batch in messages.items():
+                for message in batch:
+                    nparr = np.frombuffer(message.value, np.uint8)
+                    frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+                    ret, jpeg = cv2.imencode('.jpg', frame)
+                    yield (b'--frame\r\n'
+                       b'Content-Type: image/jpeg\r\n\r\n' + jpeg.tobytes() + b'\r\n\r\n')
 
     return StreamingHttpResponse(play_stream(), content_type='multipart/x-mixed-replace; boundary=frame')
