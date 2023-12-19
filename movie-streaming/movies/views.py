@@ -112,3 +112,50 @@ class ListAllMovies(LoginRequiredMixin, ListView):
     context_object_name = 'movies'
     template_name = 'movies/movies-all.html'
     paginate_by = 20  
+
+
+def test(request):
+   return render(request, "movies/test.html")
+
+from django.http import StreamingHttpResponse
+from kafka import KafkaConsumer
+import cv2
+import numpy as np
+
+def stream_video(request):
+    # Create a Kafka consumer
+    consumer = KafkaConsumer(
+      "KafkaVideoStream", 
+      bootstrap_servers="localhost:9092",
+      fetch_max_bytes=52428800,
+      fetch_max_wait_ms=1000,
+      fetch_min_bytes=1,
+      max_partition_fetch_bytes=1048576,
+      value_deserializer=None,  # Remove this line
+      key_deserializer=None,
+      max_in_flight_requests_per_connection=10,
+      client_id="KafkaVideoStreamClient",
+      group_id="KafkaVideoStreamConsumer",
+      auto_offset_reset='earliest',
+      max_poll_records=500,
+      max_poll_interval_ms=300000,
+      heartbeat_interval_ms=3000,
+      session_timeout_ms=10000,
+      enable_auto_commit=True,
+      auto_commit_interval_ms=5000,
+      reconnect_backoff_ms=50,
+      reconnect_backoff_max_ms=500,
+      request_timeout_ms=305000,
+      receive_buffer_bytes=32768,
+    )
+
+    # Define a generator function that yields video frames
+    def play_stream():
+        for message in consumer:
+            nparr = np.frombuffer(message.value, np.uint8)
+            frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+            ret, jpeg = cv2.imencode('.jpg', frame)
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + jpeg.tobytes() + b'\r\n\r\n')
+
+    return StreamingHttpResponse(play_stream(), content_type='multipart/x-mixed-replace; boundary=frame')
