@@ -7,5 +7,5 @@ urlpatterns = [
     path("movie/all", ListAllMovies.as_view(), name="all-movies"),
     path("movie/<int:pk>", MovieDetail.as_view(), name="movies-individual"),
     path('stream_video/', stream_video, name='stream_video'),
-    path('salaar/', salaar, name='test'),
+    path('salaar/', salaar, name='salaar'),
 ]

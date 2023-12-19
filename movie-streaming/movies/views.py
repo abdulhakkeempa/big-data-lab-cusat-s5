@@ -33,7 +33,7 @@ class ListMovies(LoginRequiredMixin, ListView):
     # Get the current user
     user = self.request.user
 
-    context['movies'] = Movie.objects.all()[:25] # get the first 25 movies
+    context['movies'] = Movie.objects.all().order_by("-id")[:25] # get the first 25 movies
     context['continue_watching'] = Movie.objects.filter(usermovierating__user=user) # where the users have provided a rating
     # context['content_recommended'] = self.recommend_movies() # get the content based recommendations
     # context['item_recommended'] = self.suggest_movies() # get the collaborative item-item based recommendations
