@@ -126,37 +126,37 @@ def salaar(request):
 def stream_video(request):
     # Create a Kafka consumer
     consumer = KafkaConsumer(
-      "KafkaVideoStream", 
-      bootstrap_servers="localhost:9092",
-      fetch_max_bytes=52428800,
-      fetch_max_wait_ms=1000,
-      fetch_min_bytes=1,
-      max_partition_fetch_bytes=1048576,
-      value_deserializer=None,  # Remove this line
-      key_deserializer=None,
-      max_in_flight_requests_per_connection=10,
-      client_id="KafkaVideoStreamClient",
-      group_id="KafkaVideoStreamConsumer",
-      auto_offset_reset='earliest',
-      max_poll_records=500,
-      max_poll_interval_ms=300000,
-      heartbeat_interval_ms=3000,
-      session_timeout_ms=10000,
-      enable_auto_commit=True,
-      auto_commit_interval_ms=5000,
-      reconnect_backoff_ms=50,
-      reconnect_backoff_max_ms=500,
-      request_timeout_ms=305000,
-      receive_buffer_bytes=32768,
+        "KafkaVideoStream", 
+        bootstrap_servers="localhost:9092",
+        fetch_max_bytes=52428800,
+        fetch_max_wait_ms=1000,
+        fetch_min_bytes=1,
+        max_partition_fetch_bytes=1048576,
+        value_deserializer=None,
+        key_deserializer=None,
+        max_in_flight_requests_per_connection=10,
+        client_id="KafkaVideoStreamClient",
+        group_id="KafkaVideoStreamConsumer",
+        auto_offset_reset='earliest',  # Start reading from the earliest offset
+        max_poll_records=500,
+        max_poll_interval_ms=300000,
+        heartbeat_interval_ms=3000,
+        session_timeout_ms=10000,
+        enable_auto_commit=True,
+        auto_commit_interval_ms=5000,
+        reconnect_backoff_ms=50,
+        reconnect_backoff_max_ms=500,
+        request_timeout_ms=305000,
+        receive_buffer_bytes=32768,
     )
 
     # Define a generator function that yields video frames
     def play_stream():
         i = 0
-        while i<100:
+        while i<50:
             # Poll for messages with a timeout of 1 second
             messages = consumer.poll(1000)
-
+            
             # If there are no messages, continue to the next iteration
             if not messages:
                 i += 1
