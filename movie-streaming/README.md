@@ -5,8 +5,8 @@ This is a minimal implementation of an OTT Plaform with UI highly inspired from 
 1. Create a .bat file in your Kafka folder (Windows)
 ```
 @echo off
-start cmd /k "E:\kafka\bin\windows\zookeeper-server-start.bat .\config\zookeeper.properties"
-start cmd /k "E:\kafka\bin\windows\kafka-server-start.bat .\config\server.properties"
+start cmd /k "actual_path_to_kafka\bin\windows\zookeeper-server-start.bat .\config\zookeeper.properties"
+start cmd /k "actual_path_to_kafka\bin\windows\kafka-server-start.bat .\config\server.properties"
 ```
 2. Run the bat file  
       This will keep the Kafka Zookeeper and the Kafka Server Up.
